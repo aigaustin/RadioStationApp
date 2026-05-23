@@ -1,0 +1,7 @@
+[sudo] password for media: [33mWARN[0m[0000] /opt/deploy/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+[36mstreamo_app  | [0m
+[36mstreamo_app  | [0m> radio-admin-backend@1.0.0 start
+[36mstreamo_app  | [0m> node server.js
+[36mstreamo_app  | [0m
+[36mstreamo_app  | [0m◇ injected env (4) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+[36mstreamo_app  | [0m[server] Radio Admin → http://localhost:4545

@@ -1,0 +1,68 @@
+{
+  "roles": [
+    {
+      "id": "admin",
+      "name": "Admin",
+      "permissions": [
+        "config:read",
+        "config:write",
+        "uploads:write",
+        "push:send",
+        "users:read",
+        "users:write",
+        "roles:read",
+        "roles:write",
+        "invites:read",
+        "invites:write",
+        "schedule:read",
+        "schedule:write",
+        "podcasts:read",
+        "podcasts:write",
+        "contact:read",
+        "contact:write",
+        "activity:read",
+        "mediacp:read",
+        "mediacp:write"
+      ],
+      "isSystem": true,
+      "createdAt": 1778770522899
+    },
+    {
+      "id": "editor",
+      "name": "Editor",
+      "permissions": [
+        "config:read",
+        "config:write",
+        "uploads:write",
+        "push:send",
+        "invites:read",
+        "schedule:read",
+        "schedule:write",
+        "podcasts:read",
+        "podcasts:write",
+        "contact:read",
+        "contact:write",
+        "activity:read",
+        "mediacp:read",
+        "mediacp:write"
+      ],
+      "isSystem": true,
+      "createdAt": 1778770522899
+    },
+    {
+      "id": "viewer",
+      "name": "Viewer",
+      "permissions": [
+        "config:read",
+        "invites:read",
+        "schedule:read",
+        "podcasts:read",
+        "contact:read",
+        "activity:read",
+        "mediacp:read"
+      ],
+      "isSystem": true,
+      "createdAt": 1778770522899
+    }
+  ]
+}

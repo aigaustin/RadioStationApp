@@ -1,0 +1,12 @@
+{
+  "users": [
+    {
+      "id": "e494eaed-a2c5-4db8-afbf-95a3e5923593",
+      "email": "admin@radio.com",
+      "passwordHash": "$2a$10$iKok2us1hz0C79.XGpN.xeStSK6g61.2aaM5xYwOtrpgxUtS4HQzm",
+      "roleId": "admin",
+      "disabled": false,
+      "createdAt": 1778770728202
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "entries": [
+    {
+      "id": "mp5rfqn49rbv",
+      "action": "config.update",
+      "userId": "e494eaed-a2c5-4db8-afbf-95a3e5923593",
+      "email": "admin@radio.com",
+      "details": null,
+      "ip": "::1",
+      "timestamp": 1778779583392
+    },
+    {
+      "id": "mp5rflt2kbjy",
+      "action": "config.update",
+      "userId": "e494eaed-a2c5-4db8-afbf-95a3e5923593",
+      "email": "admin@radio.com",
+      "details": null,
+      "ip": "::1",
+      "timestamp": 1778779577126
+    },
+    {
+      "id": "mp5npak6e8xu",
+      "action": "auth.login",
+      "userId": "e494eaed-a2c5-4db8-afbf-95a3e5923593",
+      "email": "admin@radio.com",
+      "details": null,
+      "ip": "::ffff:127.0.0.1",
+      "timestamp": 1778773310646
+    },
+    {
+      "id": "mp5mab2svh06",
+      "action": "auth.login",
+      "userId": "e494eaed-a2c5-4db8-afbf-95a3e5923593",
+      "email": "admin@radio.com",
+      "details": null,
+      "ip": "::1",
+      "timestamp": 1778770931860
+    },
+    {
+      "id": "mp5m7pp1pbs2",
+      "action": "auth.login",
+      "userId": "e494eaed-a2c5-4db8-afbf-95a3e5923593",
+      "email": "admin@radio.com",
+      "details": null,
+      "ip": "::1",
+      "timestamp": 1778770810837
+    },
+    {
+      "id": "mp5m476fn2ns",
+      "action": "auth.login",
+      "userId": "9a8dfe52-3501-4441-8a77-6f4c43d4b634",
+      "email": "admin@radio.com",
+      "details": null,
+      "ip": "::1",
+      "timestamp": 1778770646871
+    }
+  ]
+}

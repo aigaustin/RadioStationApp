@@ -1,0 +1,2 @@
+[sudo] password for media: [33mWARN[0m[0000] /opt/deploy/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
+[36mtraefik  | [0mtime="2026-05-22T21:04:31Z" level=info msg="Configuration loaded from flags."

@@ -1,0 +1,43 @@
+{
+  "name": "",
+  "tagline": "",
+  "footerText": "",
+  "streamUrl": "",
+  "nowPlayingUrl": "",
+  "scheduleEventsUrl": "",
+  "scheduleWeekUrl": "",
+  "listenerMapUrl": "",
+  "countryStatsUrl": "",
+  "apiBase": "",
+  "stationId": "",
+  "website": "",
+  "aboutText": "",
+  "contact": {
+    "email": "",
+    "phone": "",
+    "whatsapp": ""
+  },
+  "branding": {
+    "logoUrl": "",
+    "splashUrl": ""
+  },
+  "theme": {
+    "primary": "",
+    "accent": ""
+  },
+  "player": {
+    "metadataRefreshMs": 15000,
+    "reconnectMaxDelayMs": 10000,
+    "reconnectBackoff": 1.5
+  },
+  "features": {
+    "enableNotifications": false,
+    "enableSchedule": false,
+    "enablePodcasts": false
+  },
+  "mediacp": {
+    "apiKey": "",
+    "rpcUrl": "",
+    "serverId": 0
+  }
+}

@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    restart: always
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      # IMPORTANT: Change this email in production to your actual email
+      - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL:-admin@streamo.ng}"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      # - "8080:8080" # Optional: Traefik Dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-certs:/letsencrypt
+    networks:
+      - app-network
+
+  db:
+    image: postgres:15-alpine
+    container_name: streamo_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-streamo_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ChangeMeSecurePassword}
+      POSTGRES_DB: ${POSTGRES_DB:-streamo_db}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: streamo_redis
+    restart: always
+    networks:
+      - app-network
+
+  app:
+    build: 
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: streamo_app
+    restart: always
+    depends_on:
+      - db
+      - redis
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-streamo_user}:${POSTGRES_PASSWORD:-ChangeMeSecurePassword}@db:5432/${POSTGRES_DB:-streamo_db}?schema=public
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET:-GenerateARandomSecureString}
+      - PORT=4545
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app.rule=Host(`api.streamo.ng`)"
+      - "traefik.http.routers.app.entrypoints=websecure"
+      - "traefik.http.routers.app.tls.certresolver=myresolver"
+      - "traefik.http.services.app.loadbalancer.server.port=4545"
+      # Auto redirect HTTP to HTTPS
+      - "traefik.http.routers.app-http.rule=Host(`api.streamo.ng`)"
+      - "traefik.http.routers.app-http.entrypoints=web"
+      - "traefik.http.routers.app-http.middlewares=https-redirect"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+    volumes:
+      - uploads-data:/app/backend/uploads
+    networks:
+      - app-network
+
+volumes:
+  traefik-certs:
+  postgres-data:
+  uploads-data:
+
+networks:
+  app-network:
+    driver: bridge

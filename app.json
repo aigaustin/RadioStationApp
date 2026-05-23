@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "Pan Africa Radio24",
+    "slug": "pan-africa-radio24",
+    "version": "1.0.0",
+    "cli": {
+      "appVersionSource": "remote"
+    },
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0B1426"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.panafricaradio24.radio",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio"
+        ]
+      }
+    },
+    "android": {
+      "package": "com.panafricaradio24.radio",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0B1426"
+      },
+      "permissions": [
+        "INTERNET",
+        "FOREGROUND_SERVICE",
+        "POST_NOTIFICATIONS"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-notifications"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "8277966d-29d5-4049-a240-cf896b9d301f"
+      }
+    },
+    "owner": "austindebest"
+  }
+}

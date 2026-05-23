@@ -1,0 +1,8 @@
+node_modules
+.git
+.env
+android
+ios
+deploy/.env
+backend/node_modules
+frontend/node_modules
