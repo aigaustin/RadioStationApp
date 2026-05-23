@@ -12,15 +12,20 @@ COPY backend/package*.json ./backend/
 
 # Install dependencies
 WORKDIR /app/backend
-RUN npm ci
+RUN npm install
 
 # Copy the rest of the application code
 WORKDIR /app
 COPY backend/ ./backend/
+# Copy frontend and build it
 COPY frontend/ ./frontend/
+WORKDIR /app/frontend
+RUN npm install
+RUN npm run build
 
 # Generate Prisma Client
 WORKDIR /app/backend
+RUN chmod -R +x node_modules/.bin/ || true
 RUN npx prisma generate
 
 FROM node:20-bullseye-slim AS runner

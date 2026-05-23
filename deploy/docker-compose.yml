@@ -2,9 +2,11 @@ version: '3.8'
 
 services:
   traefik:
-    image: traefik:v2.10
+    image: traefik:latest
     container_name: traefik
     restart: always
+    environment:
+      - DOCKER_API_VERSION=1.41
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
@@ -51,6 +53,7 @@ services:
       dockerfile: deploy/Dockerfile
     container_name: streamo_app
     restart: always
+    command: node src/server.js
     depends_on:
       - db
       - redis
