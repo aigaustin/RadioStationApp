@@ -50,24 +50,20 @@ function normalizeRemoteConfig(raw) {
     const s1 = streams[0];
     if (s1.url) out.streamUrl = s1.url;
     if (s1.domain) {
-       out.apiBase = 'https://' + s1.domain;
-       out.stationId = 'andradio'; // Could be dynamic if backend provided it
-       out.nowPlayingUrl = 'https://' + s1.domain + '/json/stream/andradio';
-       out.scheduleEventsUrl = 'https://' + s1.domain + '/controller/Event/1/upcomingEvents';
+       out.apiBase = 'http://10.0.2.2:3000/api';
+       out.stationId = 'default';
+       out.nowPlayingUrl = 'http://10.0.2.2:8000/status-json.xsl';
+       out.scheduleEventsUrl = 'http://10.0.2.2:3000/api/modules/radio/schedule?radioStationId=default';
     }
   }
 
   // Legacy mappings for urls
-  if (typeof obj.streamUrl === 'string') out.streamUrl = obj.streamUrl;
-  if (typeof obj.nowPlayingUrl === 'string') out.nowPlayingUrl = obj.nowPlayingUrl;
-  if (typeof obj.scheduleUrl === 'string') out.scheduleUrl = obj.scheduleUrl;
-  if (typeof obj.scheduleEventsUrl === 'string') out.scheduleEventsUrl = obj.scheduleEventsUrl;
-  if (typeof obj.scheduleWeekUrl === 'string') out.scheduleWeekUrl = obj.scheduleWeekUrl;
-  if (typeof obj.listenerMapUrl === 'string') out.listenerMapUrl = obj.listenerMapUrl;
-  if (typeof obj.countryStatsUrl === 'string') out.countryStatsUrl = obj.countryStatsUrl;
-
-  if (typeof obj.apiBase === 'string') out.apiBase = obj.apiBase;
-  if (typeof obj.stationId === 'string') out.stationId = obj.stationId;
+  if (typeof obj.streamUrl === 'string') out.streamUrl = 'http://10.0.2.2:8000/stream';
+  if (typeof obj.nowPlayingUrl === 'string') out.nowPlayingUrl = 'http://10.0.2.2:8000/status-json.xsl';
+  if (typeof obj.scheduleUrl === 'string') out.scheduleUrl = 'http://10.0.2.2:3000/api/modules/radio/schedule?radioStationId=default';
+  if (typeof obj.scheduleEventsUrl === 'string') out.scheduleEventsUrl = 'http://10.0.2.2:3000/api/modules/radio/schedule?radioStationId=default';
+  if (typeof obj.apiBase === 'string') out.apiBase = 'http://10.0.2.2:3000/api';
+  if (typeof obj.stationId === 'string') out.stationId = 'default';
 
   if (typeof contact.email === 'string') out.email = contact.email;
   if (typeof contact.phone === 'string') out.phone = contact.phone;

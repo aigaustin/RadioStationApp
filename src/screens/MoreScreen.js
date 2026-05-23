@@ -67,7 +67,7 @@ function MoreHome() {
           <Ionicons name="open-outline" size={18} color={colors.textMuted} />
         </TouchableOpacity>
 
-        <Text style={styles.version}>{station.footerText || 'v1.0.0 - Powered by MediaCP'}</Text>
+        <Text style={styles.version}>{station.footerText || 'v1.0.0 - Powered by Streamo Core'}</Text>
       </ScrollView>
     </SafeAreaView>
   );

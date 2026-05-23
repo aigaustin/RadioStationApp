@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, radius, spacing } from '../theme/colors';
 import { useStation } from '../context/StationContext';
-import { createApi } from '../api/mediacp';
+import { createApi } from '../api/streamo';
 import SectionHeader from '../components/SectionHeader';
 
 export default function ContactScreen() {

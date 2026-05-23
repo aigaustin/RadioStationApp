@@ -3,7 +3,7 @@ import { FlatList, RefreshControl, Alert, ActivityIndicator, View, TouchableOpac
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { WebView } from 'react-native-webview';
-import { createApi } from '../api/mediacp';
+import { createApi } from '../api/streamo';
 import { colors } from '../theme/colors';
 import { isCurrentShow } from '../utils/time';
 import ScheduleCard from '../components/ScheduleCard';

@@ -1,405 +1,154 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
-  engineType = "library"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model Tenant {
-  id              String           @id @default(uuid())
-  name            String
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  
-  users           User[]
-  roles           Role[]
-  invites         Invite[]
-  activityLogs    ActivityLog[]
-  contactMessages ContactMessage[]
-  podcasts          Podcast[]
-  schedules         Schedule[]
-  configs           Config[]
-  pushTokens        PushToken[]
-  subscriptions     Subscription[]
-  payments          Payment[]
-  invoices          Invoice[]
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  provisioningJobs  ProvisioningJob[]
-  mediaCpAccounts   MediaCpAccount[]
-  mediaCpServices   MediaCpService[]
-  mediaCpApiLogs    MediaCpApiLog[]
-  appProfile        AppProfile?
-  appBranding       AppBranding?
-  appContactProfile AppContactProfile?
-  appSocialLinks    AppSocialLinks?
-  appFeatureFlag    AppFeatureFlag?
+  users          User[]
+  activeModules  TenantModule[]
+  radioStations  RadioStation[]
 }
 
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
+  id           String   @id @default(uuid())
+  email        String   @unique
   passwordHash String
-  firstName    String?
-  lastName     String?
-  avatarUrl    String?
-  company      String?
-  timezone     String?
-  disabled     Boolean       @default(false)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-
-  tenantId     String?       // If null, user is a Super Admin
-  tenant       Tenant?       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  
-  roleId       String?
-  role         Role?         @relation(fields: [roleId], references: [id], onDelete: SetNull)
-  
-  activityLogs ActivityLog[]
+  role         String   @default("TENANT_USER")
+  tenantId     String?
+  tenant       Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
-model Role {
-  id          String   @id @default(uuid())
+// Enums removed for SQLite compatibility
+
+// Module Registry System
+model ModuleDefinition {
+  id          String   @id // e.g., 'radio', 'tv', 'vod'
   name        String
-  permissions String[] // Array of permission strings like 'users:read', 'stream:write'
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  tenantId    String?
-  tenant      Tenant?   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  
-  users       User[]
-  invites     Invite[]
-
-  @@unique([tenantId, name])
-}
-
-model Invite {
-  id            String    @id @default(uuid())
-  token         String    @unique
-  email         String?
-  expiresAt     DateTime
-  usedAt        DateTime?
-  revokedAt     DateTime?
-  createdAt     DateTime  @default(now())
-
-  tenantId      String
-  tenant        Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
-  roleId        String
-  role          Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
-}
-
-model ActivityLog {
-  id        String   @id @default(uuid())
-  action    String
-  details   String?
-  ip        String?
-  createdAt DateTime @default(now())
-
-  tenantId  String?
-  tenant    Tenant?   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-}
-
-model ContactMessage {
-  id        String   @id @default(uuid())
-  name      String
-  email     String
-  message   String
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  tenantId  String
-  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-}
-
-model Podcast {
-  id          String   @id @default(uuid())
-  title       String
-  host        String?
-  category    String?
   description String?
-  audioUrl    String
-  artwork     String?
-  isPublished Boolean  @default(true)
+  isCore      Boolean  @default(false)
   createdAt   DateTime @default(now())
 
-  tenantId    String
-  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenants     TenantModule[]
+}
+
+model TenantModule {
+  tenantId   String
+  moduleId   String
+  isEnabled  Boolean  @default(true)
+  settings   String?    // Optional JSON config (stored as string for SQLite)
+
+  tenant     Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  module     ModuleDefinition @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@id([tenantId, moduleId])
+}
+
+// ==========================================
+// RADIO MODULE SCHEMA
+// ==========================================
+
+model RadioStation {
+  id           String   @id @default(uuid())
+  tenantId     String
+  name         String
+  description  String?
+  mountPoint   String   // e.g., '/live'
+  port         Int      // e.g., 8000
+  bitrate      Int      @default(128)
+  format       String   @default("mp3") // mp3, aac
+  status       String   @default("offline") // online, offline, suspended
+  autoDjEnabled Boolean @default(true)
+  
+  // Docker container IDs
+  icecastContainerId   String?
+  liquidsoapContainerId String?
+
+  tenant       Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  mediaFiles   MediaFile[]
+  playlists    Playlist[]
+  jingles      Jingle[]
+  schedules    Schedule[]
+  
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model MediaFile {
+  id             String       @id @default(uuid())
+  radioStationId String
+  title          String
+  artist         String?
+  album          String?
+  duration       Float?
+  filePath       String
+  fileSize       Int
+  createdAt      DateTime     @default(now())
+
+  radioStation   RadioStation @relation(fields: [radioStationId], references: [id], onDelete: Cascade)
+  playlistItems  PlaylistItem[]
+}
+
+model Playlist {
+  id             String       @id @default(uuid())
+  radioStationId String
+  name           String
+  type           String       @default("standard") // standard, rotation, scheduled
+  weight         Int          @default(1) // Playback weight/priority
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  radioStation   RadioStation @relation(fields: [radioStationId], references: [id], onDelete: Cascade)
+  items          PlaylistItem[]
+  schedules      Schedule[]
+}
+
+model PlaylistItem {
+  id         String    @id @default(uuid())
+  playlistId String
+  mediaId    String
+  sortOrder  Int       @default(0)
+
+  playlist   Playlist  @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  media      MediaFile @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([playlistId, mediaId])
+}
+
+model Jingle {
+  id             String       @id @default(uuid())
+  radioStationId String
+  name           String
+  filePath       String
+  triggerType    String       @default("interval") // interval, manual, top_of_hour
+  intervalMins   Int?         // Play every X minutes
+  
+  radioStation   RadioStation @relation(fields: [radioStationId], references: [id], onDelete: Cascade)
 }
 
 model Schedule {
-  id          String   @id @default(uuid())
-  title       String
-  host        String?
-  dayOfWeek   String   // '0'-'6' for days, or 'daily'
-  startTime   String   // 'HH:MM'
-  endTime     String   // 'HH:MM'
-  description String?
-  createdAt   DateTime @default(now())
+  id             String       @id @default(uuid())
+  radioStationId String
+  playlistId     String?
+  name           String
+  startTime      DateTime
+  endTime        DateTime
+  isRecurring    Boolean      @default(false)
+  daysOfWeek     String?      // e.g., "1,2,3,4,5"
 
-  tenantId    String
-  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  radioStation   RadioStation @relation(fields: [radioStationId], references: [id], onDelete: Cascade)
+  playlist       Playlist?    @relation(fields: [playlistId], references: [id], onDelete: SetNull)
 }
 
-model Config {
-  id        String   @id @default(uuid())
-  key       String
-  value     Json     // Flexible JSON storage for things like mediacp config, theme, branding
-  updatedAt DateTime @updatedAt
-
-  tenantId  String
-  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
-  @@unique([tenantId, key])
-}
-
-model PushToken {
-  id        String   @id @default(uuid())
-  token     String   @unique
-  deviceId  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  tenantId  String
-  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-}
-
-enum PlanType {
-  RADIO
-  TV
-  STREAMING
-  FULL
-}
-
-enum SubscriptionStatus {
-  TRIALING
-  ACTIVE
-  PAST_DUE
-  CANCELED
-  UNPAID
-  PENDING
-}
-
-enum PaymentStatus {
-  PENDING
-  SUCCESS
-  FAILED
-}
-
-model Plan {
-  id              String         @id @default(uuid())
-  name            String
-  type            PlanType
-  price           Float
-  interval        String         // 'monthly' or 'yearly'
-  features        Json           // limits like listeners, storage, bitrates
-  mediaCpPlanId   String?        // Mapping to MediaCP package/plan
-  trialDays       Int            @default(0)
-  isActive        Boolean        @default(true)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-
-  subscriptions   Subscription[]
-}
-
-model Subscription {
-  id              String             @id @default(uuid())
-  tenantId        String
-  tenant          Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  
-  planId          String
-  plan            Plan               @relation(fields: [planId], references: [id])
-  
-  status          SubscriptionStatus @default(PENDING)
-  nextBillingDate DateTime?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-
-  payments         Payment[]
-  invoices         Invoice[]
-  provisioningJobs ProvisioningJob[]
-}
-
-model Payment {
-  id             String        @id @default(uuid())
-  tenantId       String
-  tenant         Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  
-  subscriptionId String?
-  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
-  
-  amount         Float
-  currency       String        @default("NGN")
-  provider       String        // 'PAYSTACK' or 'FLUTTERWAVE'
-  reference      String        @unique
-  status         PaymentStatus @default(PENDING)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-
-  invoiceId      String?
-  invoice        Invoice?      @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
-}
-
-enum InvoiceStatus {
-  DRAFT
-  OPEN
-  PAID
-  VOID
-  UNCOLLECTIBLE
-}
-
-model Invoice {
-  id             String        @id @default(uuid())
-  tenantId       String
-  tenant         Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  subscriptionId String?
-  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
-  amount         Float
-  currency       String        @default("NGN")
-  status         InvoiceStatus @default(DRAFT)
-  dueDate        DateTime?
-  paidAt         DateTime?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-
-  payments       Payment[]
-}
-
-enum ProvisioningStatus {
-  PENDING
-  PROCESSING
-  COMPLETED
-  FAILED
-  RETRYING
-  CANCELLED
-}
-
-model ProvisioningJob {
-  id             String             @id @default(uuid())
-  tenantId       String
-  tenant         Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  subscriptionId String?
-  subscription   Subscription?      @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
-  status         ProvisioningStatus @default(PENDING)
-  payload        Json?
-  errorLogs      Json?
-  attempts       Int                @default(0)
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
-}
-
-model MediaCpAccount {
-  id              String   @id @default(uuid())
-  tenantId        String
-  tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  mediaCpId       String?  // The customer ID in MediaCP
-  email           String?
-  password        String?  // Consider storing securely or discarding after creation
-  status          String   @default("active")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  services        MediaCpService[]
-}
-
-model MediaCpService {
-  id              String          @id @default(uuid())
-  tenantId        String
-  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  accountId       String
-  account         MediaCpAccount  @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  serviceId       String?         // MediaCP service ID
-  type            String          // icecast2, flussonic, etc.
-  domain          String?
-  streamPassword  String?
-  sourcePassword  String?
-  status          String          @default("pending")
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-}
-
-model MediaCpApiLog {
-  id          String   @id @default(uuid())
-  tenantId    String?
-  tenant      Tenant?  @relation(fields: [tenantId], references: [id], onDelete: SetNull)
-  endpoint    String
-  method      String
-  request     Json?
-  response    Json?
-  statusCode  Int?
-  isError     Boolean  @default(false)
-  createdAt   DateTime @default(now())
-}
-
-model AppProfile {
-  id             String   @id @default(uuid())
-  tenantId       String   @unique
-  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  name           String?
-  description    String?
-  maintenance    Boolean  @default(false)
-  minAppVersion  String?
-  forceUpdate    Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-}
-
-model AppBranding {
-  id             String   @id @default(uuid())
-  tenantId       String   @unique
-  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  logoUrl        String?
-  splashUrl      String?
-  primaryColor   String?
-  accentColor    String?
-  theme          String?  @default("light")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-}
-
-model AppContactProfile {
-  id             String   @id @default(uuid())
-  tenantId       String   @unique
-  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  phone          String?
-  email          String?
-  address        String?
-  whatsapp       String?
-  website        String?
-  privacyUrl     String?
-  termsUrl       String?
-  supportUrl     String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-}
-
-model AppSocialLinks {
-  id             String   @id @default(uuid())
-  tenantId       String   @unique
-  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  facebook       String?
-  twitter        String?
-  instagram      String?
-  youtube        String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-}
-
-model AppFeatureFlag {
-  id             String   @id @default(uuid())
-  tenantId       String   @unique
-  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  enableChat     Boolean  @default(false)
-  enablePodcasts Boolean  @default(false)
-  enableSchedule Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-}
+// Note: TV, VOD, and Podcast modules will append their schema models here in future updates.

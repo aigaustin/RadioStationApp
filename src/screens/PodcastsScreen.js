@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Linking, Alert, ActivityIndicator, View, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { createApi } from '../api/mediacp';
+import { createApi } from '../api/streamo';
 import { colors } from '../theme/colors';
 import { usePlayer } from '../context/PlayerContext';
 import { useFavorites } from '../hooks/useFavorites';

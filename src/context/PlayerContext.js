@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
 import { STATION } from '../config/station';
-import { createApi } from '../api/mediacp';
+import { createApi } from '../api/streamo';
 import { storage } from '../utils/storage';
 import { useStation } from './StationContext';
 

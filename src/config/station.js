@@ -1,7 +1,7 @@
 export const STATION = {
   name: 'Pan Africa Radio24',
   tagline: 'Africa Official Radio Station',
-  footerText: 'v1.0.0 - Powered by MediaCP',
+  footerText: 'v1.0.0 - Powered by Streamo Core',
   logo: require('../../assets/icon.png'),
   remoteConfigUrl: 'https://api.streamo.ng/api/mobile/v1/global/config',
   streamUrl: '',
